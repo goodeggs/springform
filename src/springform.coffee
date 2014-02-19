@@ -12,12 +12,12 @@ class Springform
       field.id ?= [@prefix, field.name].join '-'
       @fields[field.name] = field
 
-  data: (data) ->
-    if arguments.length
-      @data = data
-      return @
-    else
-      _(data).pick _(@fields).pluck 'name'
+  bind: (data) ->
+    @data = data
+    @
+
+  prunedData: ->
+    _(data).pick _(@fields).pluck 'name'
 
   errors: (errors) ->
     if arguments.length
@@ -38,5 +38,12 @@ class Springform
     Object.keys(@fieldErrors).length > 0 or @formError
 
   nameToLabel: (name) -> name
+
+Springform.validators =
+  required: (form) ->
+    for {name, required} in form.fields
+      value = form.data[name]
+      if required and not (value or value is false)
+        form.fieldErrors[name] = 'required'
 
 module.exports = Springform

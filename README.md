@@ -51,7 +51,7 @@ Validate a form server-side
 Here's how you might validate an XMLHttpRequest JSON form POST from an express controller, and send back validation errors to be shown on the client:
 ```js
 (req, res) ->
-  var form = robotForm().data(req.body).validate()
+  var form = robotForm().bind(req.body).validate()
   if(form.hasErrors()) {
     res.json(form.errors())
   } else {

@@ -1,4 +1,3 @@
-require 'should'
 Springform = require '..'
 
 describe 'Springform', ->
@@ -41,6 +40,26 @@ describe 'Springform', ->
 
         new Form().fields.firstName.label.should.equal 'First Name'
 
+
+  describe 'validators', ->
+    describe 'required', ->
+      {Form} = {}
+      beforeEach ->
+        class Form extends Springform
+          fields: [{name: 'sound', required: true}]
+          validators: [Springform.validators.required]
+
+      it 'adds per-field error messages for missing values', ->
+        new Form()
+          .bind({})
+          .validate()
+          .fieldErrors.sound.should.be.ok
+
+      it 'passes with Boolean false value', ->
+        new Form()
+          .bind(sound: false)
+          .validate()
+          .fieldErrors.should.not.have.property 'sound'
 
 
 
