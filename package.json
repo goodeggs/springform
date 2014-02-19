@@ -12,20 +12,23 @@
     "rendering",
     "binding"
   ],
-  "main": "springform",
+  "main": "lib/springform",
   "repository": {
     "type": "git",
     "url": "git://github.com/goodeggs/springform.git"
   },
   "homepage": "https://github.com/goodeggs/springform",
   "bugs": "https://github.com/goodeggs/springform/issues",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffee-script": ">=1.7.x",
-    "mocha": "~1.x.x"
+    "mocha": "~1.x.x",
+    "should": "~3.1.2"
   },
   "scripts": {
-    "test": "mocha"
+    "build": "coffee --bare --compile --output lib/ src/",
+    "pretest": "npm run-script build",
+    "test": "mocha",
+    "prepublish": "npm run-script build"
   }
 }
