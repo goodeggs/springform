@@ -22,6 +22,30 @@ describe 'Springform', ->
       form.fields.sound.should.be.ok
       form.validators.length.should.equal 1
 
+  describe 'hasErrors', ->
+    {form} = {}
+    beforeEach ->
+      form = new Springform
+
+    describe 'when the form has no errors', ->
+      it 'is false', ->
+        form.hasErrors().should.equal false
+
+    describe 'with a form level error message', ->
+      beforeEach ->
+        form.formError = 'Busted!'
+
+      it 'is true', ->
+        form.hasErrors().should.equal true
+
+    describe 'with any field level error message', ->
+      beforeEach ->
+        form.fieldErrors.foo = 'Busted!'
+
+      it 'is true', ->
+        form.hasErrors().should.equal true
+
+
   describe 'fields', ->
     describe 'without a label', ->
       {Form} = {}
