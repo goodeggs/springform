@@ -22,7 +22,51 @@ describe 'Springform', ->
       form.fields.sound.should.be.ok
       form.validators.length.should.equal 1
 
-  describe 'hasErrors', ->
+  describe '::bind()', ->
+    {form} = {}
+    beforeEach ->
+      form = new Springform
+
+    it 'sets form data', ->
+      form.bind(foo: 'bar')
+      form.data.foo.should.equal 'bar'
+
+    it 'is chainable', ->
+      form.bind().should.equal.form
+
+  describe '::errors()', ->
+    {form, errors} = {}
+    beforeEach ->
+      form = new Springform
+      errors =
+        formError: 'Busted!'
+        fieldErrors:
+          foo: 'bar'
+
+    describe 'given form and field errors', ->
+      it 'sets errors on the form', ->
+        form.errors(errors)
+        form.fieldErrors.should.eql errors.fieldErrors
+        form.formError.should.eql errors.formError
+
+      it 'is chainable', ->
+        form.errors(errors).should.equal form
+
+    describe 'with no arguments', ->
+      it 'returns fieldErrors and formError', ->
+        form
+          .errors(errors)
+          .errors().fieldErrors.should.equal errors.fieldErrors
+
+  describe '::validate()', ->
+    {form} = {}
+    beforeEach ->
+      form = new Springform
+
+    it 'is chainable', ->
+      form.validate().should.equal form
+
+  describe '::hasErrors()', ->
     {form} = {}
     beforeEach ->
       form = new Springform
