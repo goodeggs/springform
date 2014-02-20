@@ -90,6 +90,19 @@ describe 'Springform', ->
         form.hasErrors().should.equal true
 
 
+  describe 'prefix', ->
+    it 'is omitted by default', ->
+      new Springform().should.not.have.property 'prefix'
+
+    describe 'when set', ->
+      {form} = {}
+      beforeEach ->
+        form = new Springform(prefix: 'robo', fields: [{name: 'color'}])
+
+      it 'is passed to fields', ->
+        form.fields.color.prefix.should.equal 'robo'
+
+
   describe 'fields', ->
     describe 'without a label', ->
       {Form} = {}

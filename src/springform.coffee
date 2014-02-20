@@ -2,12 +2,12 @@ class Springform
   constructor: (attrs={}) ->
     @[key] = value for key, value of attrs
 
-    @prefix ?= 'springform'
     @fieldErrors ?= {}
     @formError = null
 
     @fields ?= []
     for field in @fields
+      field.prefix = @prefix
       field.label ?= @nameToLabel field.name
       field.id ?= [@prefix, field.name].join '-'
       @fields[field.name] = field
