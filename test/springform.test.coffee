@@ -63,6 +63,20 @@ describe 'Springform', ->
     beforeEach ->
       form = new Springform
 
+    describe 'on a form with validators', ->
+      beforeEach ->
+        form.validators = [
+          (form) ->
+            form.fieldErrors.beep = true
+          (form) ->
+            form.fieldErrors.boop = true
+        ]
+
+      it 'calls all validators', ->
+        form.validate()
+        form.fieldErrors.beep.should.equal true
+        form.fieldErrors.boop.should.equal true
+
     it 'is chainable', ->
       form.validate().should.equal form
 
