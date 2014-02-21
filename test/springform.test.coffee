@@ -2,14 +2,18 @@ Springform = require '..'
 
 describe 'Springform', ->
   describe 'constructor', ->
-    it 'accepts fields and validators', ->
+    {form} = {}
+    beforeEach ->
       form = new Springform
         fields: [{name: 'sound'}]
         validators: [(form)->]
 
+    it 'accepts fields and validators', ->
       form.fields.length.should.equal 1
-      form.fields.sound.should.be.ok
       form.validators.length.should.equal 1
+
+    it 'maps fields by name', ->
+      form.fields.sound.should.be.ok
 
   describe 'subclass', ->
     it 'can define fields and validators on the prototype', ->
@@ -105,7 +109,7 @@ describe 'Springform', ->
       it 'is false', ->
         form.hasErrors().should.equal false
 
-    describe 'falsy values in fieldsErrors', ->
+    describe 'undefined values in fieldsErrors', ->
       beforeEach ->
         form.fieldErrors.beep = null
 
@@ -176,45 +180,14 @@ describe 'Springform', ->
       it 'is chainable', ->
         form.processor((done)->).should.equal form
 
-  describe 'prefix', ->
-    it 'is omitted by default', ->
-      new Springform().should.not.have.property 'prefix'
-
-    describe 'when set', ->
-      {form} = {}
-      beforeEach ->
-        form = new Springform(prefix: 'robo', fields: [{name: 'color'}])
-
-      it 'is passed to fields', ->
-        form.fields.color.prefix.should.equal 'robo'
-
-
-  describe 'fields', ->
-    describe 'without a label', ->
-      {Form} = {}
-      beforeEach ->
-        class Form extends Springform
-          fields: [{name: 'firstName'}]
-
-      it 'get a generated label', ->
-        new Form().fields.firstName.label.should.equal 'firstName'
-
-      it 'can customize label generation', ->
-        Form::nameToLabel = (name) ->
-          name
-            .replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/(^[a-z])/g, (str, p1) -> p1.toUpperCase())
-
-        new Form().fields.firstName.label.should.equal 'First Name'
-
-
   describe 'validators', ->
     describe 'required', ->
       {Form} = {}
       beforeEach ->
         class Form extends Springform
-          fields: [{name: 'sound', required: true}]
-          validators: [Springform.validators.required]
+          validators: [
+            Springform.validators.required 'sound'
+          ]
 
       it 'adds per-field error messages for missing values', ->
         new Form()

@@ -9,10 +9,6 @@ Create just one form:
 ```js
 var Springform = require('springform'),
     robotForm = new Springform({
-      fields: [
-        {name: 'color'},
-        {name: 'sound', label: 'What noise does it make?'}
-      ],
       validators: [
         function(form) {
           if(form.data.color != 'red') {

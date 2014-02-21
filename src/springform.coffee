@@ -7,9 +7,6 @@ class Springform
 
     @fields ?= []
     for field in @fields
-      field.prefix = @prefix
-      field.label ?= @nameToLabel field.name
-      field.id ?= [@prefix, field.name].join '-'
       @fields[field.name] = field
 
   bind: (data) ->
@@ -44,8 +41,6 @@ class Springform
     Object.keys(@fieldErrors).some (key) =>
       Boolean @fieldErrors[key]
 
-  nameToLabel: (name) -> name
-
   submit: (event) ->
     event?.preventDefault()
     @processing = true
@@ -57,11 +52,12 @@ class Springform
   processor: (@process) -> @
 
 Springform.validators =
-  required: (form) ->
-    for {name, required} in form.fields
-      value = form.data[name]
-      if required and not (value or value is false)
-        form.fieldErrors[name] = 'required'
+  required: (fields...) ->
+    ({data, fieldErrors}) ->
+      for field in fields
+        value = data[field]
+        unless value or value is false
+          fieldErrors[field] = 'required'
 
 class Gate
   constructor: ->
