@@ -221,7 +221,7 @@ describe 'Springform', ->
       describe 'on a prototype', ->
         beforeEach ->
           class Form extends Springform
-            asyncSubmission @::
+            @::using asyncSubmission
 
             process: (done) ->
               @formError = 'processing failed'
@@ -234,11 +234,10 @@ describe 'Springform', ->
       describe 'on an instance', ->
         beforeEach ->
           form = new Springform()
-          form.process = (done) ->
-            form.formError = 'processing failed'
-            done()
-
-          asyncSubmission(form)
+            .using(asyncSubmission)
+            .processor (done) ->
+              form.formError = 'processing failed'
+              done()
 
         describeAsyncSubmission()
 
@@ -259,7 +258,7 @@ describe 'Springform', ->
                 , 1
             ]
 
-          it 'it calls a callback when all validators complete', (done) ->
+          it 'calls a callback when all validators complete', (done) ->
             form.validate ->
               form.formError.should.equal 'invalid'
               done()
@@ -270,11 +269,7 @@ describe 'Springform', ->
       describe 'on a prototype', ->
         beforeEach ->
           class Form extends Springform
-            asyncValidation @::
-
-            process: (done) ->
-              @formError = 'processing failed'
-              done()
+            @::using asyncValidation
 
           form = new Form()
 
@@ -282,12 +277,7 @@ describe 'Springform', ->
 
       describe 'on an instance', ->
         beforeEach ->
-          form = new Springform()
-          form.process = (done) ->
-            form.formError = 'processing failed'
-            done()
-
-          asyncValidation(form)
+          form = new Springform().using(asyncValidation)
 
         describeAsyncValidation()
 

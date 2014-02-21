@@ -41,6 +41,10 @@ class Springform
 
   nameToLabel: (name) -> name
 
+  using: (behavior) ->
+    behavior @
+    @
+
 Springform.validators =
   required: (form) ->
     for {name, required} in form.fields
