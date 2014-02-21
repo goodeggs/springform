@@ -9,6 +9,7 @@ Create just one form:
 ```js
 var Springform = require('springform')
     robotForm = new Springform()
+      .validator(Springform.required('sound'))
       .validator(function(form) {
         if(form.data.color != 'red') {
           form.fieldErrors.color = 'Pick a better color'
@@ -30,6 +31,7 @@ class RobotForm extends Springform
   ]
 
   validators: [
+    Springform.required 'color'
     (form) ->
       {data, fieldErrors} = form
       unless data.color is 'red'

@@ -56,13 +56,12 @@ class Springform
 
   processor: (@process) -> @
 
-Springform.validators =
-  required: (fields...) ->
-    ({data, fieldErrors}) ->
-      for field in fields
-        value = data[field]
-        unless value or value is false
-          fieldErrors[field] = 'required'
+Springform.required = (fields...) ->
+  ({data, fieldErrors}) ->
+    for field in fields
+      value = data[field]
+      unless value or value is false
+        fieldErrors[field] = 'required'
 
 class Gate
   constructor: ->

@@ -195,7 +195,7 @@ describe 'Springform', ->
       beforeEach ->
         class Form extends Springform
           validators: [
-            Springform.validators.required 'sound'
+            Springform.required 'sound'
           ]
 
       it 'adds per-field error messages for missing values', ->
