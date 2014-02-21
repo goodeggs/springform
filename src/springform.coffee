@@ -27,11 +27,16 @@ class Springform
     else
       {@formError, @fieldErrors}
 
-  validate: ->
+  validate: (done) ->
     @formError = null
     @fieldErrors = {}
+    gate = new Gate()
     for validator in @validators or []
-      validator @
+      if validator.length > 1
+        validator @, gate.callback()
+      else
+        validator @
+    gate.finished done
     @
 
   hasErrors: ->
@@ -41,9 +46,15 @@ class Springform
 
   nameToLabel: (name) -> name
 
-  using: (behavior) ->
-    behavior @
-    @
+  submit: (event) ->
+    event?.preventDefault()
+    @processing = true
+    @process =>
+      @processing = false
+
+  process: (done) -> done()
+
+  processor: (@process) -> @
 
 Springform.validators =
   required: (form) ->
@@ -52,55 +63,26 @@ Springform.validators =
       if required and not (value or value is false)
         form.fieldErrors[name] = 'required'
 
-Springform.behaviors =
-  asyncSubmission: (form) ->
-    form.submit = (event) ->
-      event?.preventDefault()
-      @processing = true
-      @process =>
-        @processing = false
+class Gate
+  constructor: ->
+    @callbacks = []
+    @returnedCount = 0
 
-    form.process ?= (done) -> done()
+  checkDone: ->
+    if @returnedCount == @callbacks.length
+      setTimeout @done, 0
 
-    form.processor = (@process) -> @
+  callback: ->
+    called = false
+    callback = =>
+      return if called; called = true
+      @returnedCount += 1
+      @checkDone()
+    @callbacks.push callback
+    return callback
 
-  asyncValidation: (form) ->
-    class Gate
-      constructor: ->
-        @callbacks = []
-        @returnedCount = 0
-
-      checkDone: ->
-        if @returnedCount == @callbacks.length
-          setTimeout @done, 0
-
-      callback: ->
-        called = false
-        callback = =>
-          return if called; called = true
-          @returnedCount += 1
-          @checkDone()
-        @callbacks.push callback
-        return callback
-
-      finished: (callback) ->
-        @done = callback
-        @checkDone()
-
-    form.validate = (done) ->
-      @formError = null
-      @fieldErrors = {}
-      @processing = true
-      gate = new Gate()
-      for validator in @validators or []
-        if validator.length > 1
-          validator @, gate.callback()
-        else
-          validator @
-      gate.finished ->
-        @processing = false
-        done()
-      @
-
+  finished: (callback) ->
+    @done = callback
+    @checkDone()
 
 module?.exports = Springform

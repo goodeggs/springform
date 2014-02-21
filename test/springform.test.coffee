@@ -77,6 +77,22 @@ describe 'Springform', ->
         form.fieldErrors.beep.should.equal true
         form.fieldErrors.boop.should.equal true
 
+    describe 'with async validators', ->
+      beforeEach ->
+        form.validators = [
+          (form) ->
+          (form, done) ->
+            setTimeout ->
+              form.formError = 'invalid'
+              done()
+            , 1
+        ]
+
+      it 'calls a callback when all validators complete', (done) ->
+        form.validate ->
+          form.formError.should.equal 'invalid'
+          done()
+
     it 'is chainable', ->
       form.validate().should.equal form
 
@@ -112,6 +128,53 @@ describe 'Springform', ->
       it 'is true', ->
         form.hasErrors().should.equal true
 
+    describe '::submit()', ->
+      {form} = {}
+      beforeEach ->
+        form = new Springform()
+          .processor (done) ->
+            form.formError = 'processing failed'
+            done()
+
+      it 'calls the processor', ->
+        form.submit()
+        form.formError.should.equal 'processing failed'
+
+      describe 'given an async processor', ->
+        {complete} = {}
+        beforeEach ->
+          form.processor (done) ->
+            complete = done
+          form.submit()
+
+        it 'sets processing flag', ->
+          form.processing.should.equal true
+
+        describe 'when the processor completes', ->
+          beforeEach (done) ->
+            setTimeout (-> complete(); done()), 1
+
+          it 'clears the processing flag', ->
+            form.processing.should.equal false
+
+      describe 'given an event', ->
+        {event, prevented} = {}
+        beforeEach ->
+          prevented = false
+          event = preventDefault: -> prevented = true
+
+        it 'prevents default submission', ->
+          form.submit(event)
+          prevented.should.equal true
+
+    describe '::processor()', ->
+      it 'assigns the process function', ->
+        model = save: (done) ->
+        form.processor model.save
+        form.process.should.equal model.save
+
+      it 'is chainable', ->
+        form.processor((done)->).should.equal form
 
   describe 'prefix', ->
     it 'is omitted by default', ->
@@ -164,121 +227,4 @@ describe 'Springform', ->
           .bind(sound: false)
           .validate()
           .fieldErrors.should.not.have.property 'sound'
-
-  describe 'behaviors', ->
-    describe 'asyncSubmission', ->
-      {asyncSubmission} = Springform.behaviors
-      {form} = {}
-
-      describeAsyncSubmission = ->
-        it 'adds submit() and processor() methods', ->
-          (typeof form.submit).should.equal 'function'
-          (typeof form.processor).should.equal 'function'
-
-        describe 'submit', ->
-
-          it 'calls the processor', ->
-            form.submit()
-            form.formError.should.equal 'processing failed'
-
-          describe 'given an async processor', ->
-            {complete} = {}
-            beforeEach ->
-              form.processor (done) ->
-                complete = done
-              form.submit()
-
-            it 'sets processing flag', ->
-              form.processing.should.equal true
-
-            describe 'when the processor completes', ->
-              beforeEach (done) ->
-                setTimeout (-> complete(); done()), 1
-
-              it 'clears the processing flag', ->
-                form.processing.should.equal false
-
-          describe 'given an event', ->
-            {event, prevented} = {}
-            beforeEach ->
-              prevented = false
-              event = preventDefault: -> prevented = true
-
-            it 'prevents default submission', ->
-              form.submit(event)
-              prevented.should.equal true
-
-        describe '::processor()', ->
-          it 'assigns the process function', ->
-            model = save: (done) ->
-            form.processor model.save
-            form.process.should.equal model.save
-
-          it 'is chainable', ->
-            form.processor((done)->).should.equal form
-
-
-      describe 'on a prototype', ->
-        beforeEach ->
-          class Form extends Springform
-            @::using asyncSubmission
-
-            process: (done) ->
-              @formError = 'processing failed'
-              done()
-
-          form = new Form()
-
-        describeAsyncSubmission()
-
-      describe 'on an instance', ->
-        beforeEach ->
-          form = new Springform()
-            .using(asyncSubmission)
-            .processor (done) ->
-              form.formError = 'processing failed'
-              done()
-
-        describeAsyncSubmission()
-
-    describe 'asyncValidatation', ->
-      {asyncValidation} = Springform.behaviors
-      {form} = {}
-
-      describeAsyncValidation = ->
-
-        describe '::validate()', ->
-          beforeEach ->
-            form.validators = [
-              (form) ->
-              (form, done) ->
-                setTimeout ->
-                  form.formError = 'invalid'
-                  done()
-                , 1
-            ]
-
-          it 'calls a callback when all validators complete', (done) ->
-            form.validate ->
-              form.formError.should.equal 'invalid'
-              done()
-
-        it 'is chainable', ->
-          form.validate((done)->).should.equal form
-
-      describe 'on a prototype', ->
-        beforeEach ->
-          class Form extends Springform
-            @::using asyncValidation
-
-          form = new Form()
-
-        describeAsyncValidation()
-
-      describe 'on an instance', ->
-        beforeEach ->
-          form = new Springform().using(asyncValidation)
-
-        describeAsyncValidation()
-
 
