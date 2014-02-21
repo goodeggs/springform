@@ -75,6 +75,15 @@ describe 'Springform', ->
       it 'is false', ->
         form.hasErrors().should.equal false
 
+    describe 'falsy values in fieldsErrors', ->
+      beforeEach ->
+        form.fieldErrors.beep = null
+
+      it 'are ignored', ->
+        # rivets can be configured to create empty enumerable
+        # properties on the errors object
+        form.hasErrors().should.equal false
+
     describe 'with a form level error message', ->
       beforeEach ->
         form.formError = 'Busted!'

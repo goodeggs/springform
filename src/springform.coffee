@@ -35,7 +35,9 @@ class Springform
     @
 
   hasErrors: ->
-    Boolean Object.keys(@fieldErrors).length > 0 or @formError
+    Boolean(@formError) or
+    Object.keys(@fieldErrors).some (key) =>
+      Boolean @fieldErrors[key]
 
   nameToLabel: (name) -> name
 
