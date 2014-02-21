@@ -194,6 +194,14 @@ describe 'Springform', ->
               form.submit(event)
               prevented.should.equal true
 
+        describe 'processor', ->
+          it 'assigns the process function', ->
+            model = save: (done) ->
+            form.processor model.save
+            form.process.should.equal model.save
+
+          it 'is chainable', ->
+            form.processor((done)->).should.equal form
 
 
       describe 'on a prototype', ->
@@ -219,9 +227,4 @@ describe 'Springform', ->
           asyncSubmit(form)
 
         describeAsyncSubmit()
-
-
-
-
-
 
