@@ -48,4 +48,16 @@ Springform.validators =
       if required and not (value or value is false)
         form.fieldErrors[name] = 'required'
 
+Springform.behaviors =
+  asyncSubmit: (form) ->
+    form.submit = (event) ->
+      event?.preventDefault()
+      @processing = true
+      @process =>
+        @processing = false
+
+    form.process ?= (done) -> done()
+
+    form.processor = (@process) -> @
+
 module.exports = Springform

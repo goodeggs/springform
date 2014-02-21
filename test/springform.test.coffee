@@ -151,6 +151,77 @@ describe 'Springform', ->
           .validate()
           .fieldErrors.should.not.have.property 'sound'
 
+  describe 'behaviors', ->
+    describe 'asyncSubmit', ->
+      {asyncSubmit} = Springform.behaviors
+      {form} = {}
+
+      describeAsyncSubmit = ->
+        it 'adds submit() and processor() methods', ->
+          (typeof form.submit).should.equal 'function'
+          (typeof form.processor).should.equal 'function'
+
+        describe 'submit', ->
+
+          it 'calls the processor', ->
+            form.submit()
+            form.formError.should.equal 'processing failed'
+
+          describe 'given an async processor', ->
+            {complete} = {}
+            beforeEach ->
+              form.processor (done) ->
+                complete = done
+              form.submit()
+
+            it 'sets processing flag', ->
+              form.processing.should.equal true
+
+            describe 'when the processor completes', ->
+              beforeEach (done) ->
+                setTimeout (-> complete(); done()), 1
+
+              it 'clears the processing flag', ->
+                form.processing.should.equal false
+
+          describe 'given an event', ->
+            {event, prevented} = {}
+            beforeEach ->
+              prevented = false
+              event = preventDefault: -> prevented = true
+
+            it 'prevents default submission', ->
+              form.submit(event)
+              prevented.should.equal true
+
+
+
+      describe 'on a prototype', ->
+        beforeEach ->
+          class Form extends Springform
+            asyncSubmit @::
+
+            process: (done) ->
+              @formError = 'processing failed'
+              done()
+
+          form = new Form()
+
+        describeAsyncSubmit()
+
+      describe 'on an instance', ->
+        beforeEach ->
+          form = new Springform()
+          form.process = (done) ->
+            form.formError = 'processing failed'
+            done()
+
+          asyncSubmit(form)
+
+        describeAsyncSubmit()
+
+
+
 
 
 
