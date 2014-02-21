@@ -31,7 +31,7 @@ class Springform
     @formError = null
     @fieldErrors = {}
     for validator in @validators or []
-      validator(@)
+      validator @
     @
 
   hasErrors: ->
@@ -49,7 +49,7 @@ Springform.validators =
         form.fieldErrors[name] = 'required'
 
 Springform.behaviors =
-  asyncSubmit: (form) ->
+  asyncSubmission: (form) ->
     form.submit = (event) ->
       event?.preventDefault()
       @processing = true
@@ -60,4 +60,43 @@ Springform.behaviors =
 
     form.processor = (@process) -> @
 
-module.exports = Springform
+  asyncValidation: (form) ->
+    class Gate
+      constructor: ->
+        @callbacks = []
+        @returnedCount = 0
+
+      checkDone: ->
+        if @returnedCount == @callbacks.length
+          setTimeout @done, 0
+
+      callback: ->
+        called = false
+        callback = =>
+          return if called; called = true
+          @returnedCount += 1
+          @checkDone()
+        @callbacks.push callback
+        return callback
+
+      finished: (callback) ->
+        @done = callback
+        @checkDone()
+
+    form.validate = (done) ->
+      @formError = null
+      @fieldErrors = {}
+      @processing = true
+      gate = new Gate()
+      for validator in @validators or []
+        if validator.length > 1
+          validator @, gate.callback()
+        else
+          validator @
+      gate.finished ->
+        @processing = false
+        done()
+      @
+
+
+module?.exports = Springform
