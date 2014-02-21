@@ -4,6 +4,7 @@ class Springform
 
     @fieldErrors ?= {}
     @formError = null
+    @validators = if @validators then @validators.slice() else []
 
     @fields ?= []
     for field in @fields
@@ -23,6 +24,10 @@ class Springform
       return @
     else
       {@formError, @fieldErrors}
+
+  validator: (validator) ->
+    @validators.push validator
+    @
 
   validate: (done) ->
     @formError = null
