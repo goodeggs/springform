@@ -180,6 +180,11 @@ describe 'Springform', ->
           form.submit(event)
           prevented.should.equal true
 
+      describe 'called without context', ->
+        it 'is bound to the form', ->
+          submit = form.submit
+          submit()
+
     describe '::processor()', ->
       it 'assigns the process function', ->
         model = save: (done) ->

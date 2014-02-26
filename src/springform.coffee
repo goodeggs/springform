@@ -46,7 +46,7 @@ class Springform
     Object.keys(@fieldErrors).some (key) =>
       Boolean @fieldErrors[key]
 
-  submit: (event) ->
+  submit: (event) =>
     event?.preventDefault()
     @processing = true
     @process =>
