@@ -1,4 +1,5 @@
 Springform = require '..'
+sinon = require 'sinon'
 
 describe 'Springform', ->
   describe 'constructor', ->
@@ -156,12 +157,19 @@ describe 'Springform', ->
       describe 'given an async processor', ->
         {complete} = {}
         beforeEach ->
-          form.processor (done) ->
+          form.processor sinon.spy (done) ->
             complete = done
           form.submit()
 
         it 'sets processing flag', ->
           form.processing.should.equal true
+
+        describe 'when the form is submitted while processing', ->
+          beforeEach ->
+            form.submit()
+
+          it "doesn't call the processor again", ->
+            form.process.callCount.should.equal 1
 
         describe 'when the processor completes', ->
           beforeEach (done) ->

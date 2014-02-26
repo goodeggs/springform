@@ -48,6 +48,7 @@ class Springform
 
   submit: (event) =>
     event?.preventDefault()
+    return if @processing
     @processing = true
     @process =>
       @processing = false
