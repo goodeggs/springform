@@ -5,7 +5,7 @@ For cheesecake and full-stack form processing.
 
 Spring form is minimial, it's mostly convetion.  It supplies just the right hooks to validate forms in the browser, submit them to a server, validate in node, and show the resulting errors.
 
-Create just one form:
+Create just one form with a chainable interface:
 ```js
 var Springform = require('springform')
     robotForm = new Springform()
@@ -22,14 +22,9 @@ var Springform = require('springform')
       })
 ```
 
-Or setup a prototype chain for a whole class of forms:
+Or setup a prototype chain for a whole class of forms using a declarative syntax:
 ```coffee
 class RobotForm extends Springform
-  fields: [
-    {name: 'color'}
-    {name: 'sound', label: 'What noise does it make?'}
-  ]
-
   validators: [
     Springform.required 'color'
     (form) ->
@@ -75,6 +70,7 @@ var robot = {sound: 'beep', color: 'red'},
             if(!form.hasErrors()) {
               alert('done!')
             }
+            done()
           }
         })
       })
