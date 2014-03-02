@@ -54,6 +54,11 @@ describe 'Springform', ->
         form.fieldErrors.should.eql errors.fieldErrors
         form.formError.should.eql errors.formError
 
+      it 'defaults fieldsErrors to an empty object', ->
+        form.errors({})
+        form.fieldErrors.should.be.an.Object
+        form.fieldErrors.should.be.empty
+
       it 'is chainable', ->
         form.errors(errors).should.equal form
 
