@@ -20,7 +20,7 @@ class Springform
   errors: (errors) ->
     if arguments.length
       @formError = errors.formError
-      @fieldErrors = errors.fieldErrors or []
+      @fieldErrors = errors.fieldErrors or {}
       return @
     else
       {@formError, @fieldErrors}
