@@ -1,9 +1,9 @@
-springform [![NPM version](https://badge.fury.io/js/springform.png)](http://badge.fury.io/js/springform) [![Build Status](https://travis-ci.org/goodeggs/springform.png)](https://travis-ci.org/goodeggs/springform)
+Springform [![NPM version](https://badge.fury.io/js/springform.png)](http://badge.fury.io/js/springform) [![Build Status](https://travis-ci.org/goodeggs/springform.png)](https://travis-ci.org/goodeggs/springform)
 ==============
 
-For cheesecake and full-stack form processing.
+Full-stack javascript form processing.
 
-A Springform is a minimial (mostly convetion) [Presenter](http://en.wikipedia.org/wiki/Model_View_Presenter) or [View Model](http://en.wikipedia.org/wiki/Model_View_ViewModel) with just the right hooks to validate forms in the browser, submit them to a server, validate in node, and show the resulting errors.
+Springform is a minimial (mostly convetion) [Presenter](http://en.wikipedia.org/wiki/Model_View_Presenter) or [View Model](http://en.wikipedia.org/wiki/Model_View_ViewModel) with just the right hooks to validate forms in the browser, submit them to a server, validate in node, and show the resulting errors.
 
 Create just one form with a chainable interface:
 ```js
@@ -148,13 +148,31 @@ function(form, done) {
 
 API
 ---
-
 #### bind(data)
 Chainable sugar to set `form.data`.  Feel free to set form.data directly if you don't need chainability.
 
-#### validators
-An array of validation functions to run when `validate()` is called.  You can set `validators` directly, set it on a prototype, or call `validator()` to add validators one at a time.
+#### hasErrors()
+Returns true if `formError` or any `fieldErrors[*]` is truthy.
 
 #### validate([done])
-Call 
+Clear `formError` and `fieldErrors` then run all the `validators`.  You can always pass a callback, to be called when all validators have finished.  It's an especially good idea if any of your validators are async.
+
+#### validator(validatorFn)
+Chainable sugar to push a [validator function](#validators) onto `validators` to be run when `validate()` is called.
+
+#### validators
+An array of [validator function](#validators) to run when `validate()` is called.  You can set `validators` directly, set it on a prototype, or call `validator()` to add validators one at a time.
+
+#### submit([event])
+Call `process()` and set the `processing` flag while it's running.  Calls `preventDefault()` on the passed in event if used as an event listener.
+
+#### process(done)
+An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done`.  Processors frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `processor()`.
+
+#### processor(processorFn)
+Chainable sugar to set `process`.
+
+
+
+
 
