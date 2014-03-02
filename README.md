@@ -167,7 +167,7 @@ An array of [validator function](#validators) to run when `validate()` is called
 Call `process()` and set the `processing` flag while it's running.  Calls `preventDefault()` on the passed in event if used as an event listener.
 
 #### process(done)
-An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done`.  Processors frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `processor()`.
+An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done` if you want to unlock form re-submission.  Processors frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `processor()`.
 
 #### processor(processorFn)
 Chainable sugar to set `process`.
