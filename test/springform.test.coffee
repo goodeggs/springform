@@ -27,18 +27,6 @@ describe 'Springform', ->
       form.fields.sound.should.be.ok
       form.validators.length.should.equal 1
 
-  describe '::bind()', ->
-    {form} = {}
-    beforeEach ->
-      form = new Springform
-
-    it 'sets form data', ->
-      form.bind(foo: 'bar')
-      form.data.foo.should.equal 'bar'
-
-    it 'is chainable', ->
-      form.bind().should.equal.form
-
   describe '::errors()', ->
     {form, errors} = {}
     beforeEach ->
@@ -147,65 +135,79 @@ describe 'Springform', ->
       it 'is true', ->
         form.hasErrors().should.equal true
 
-    describe '::submit()', ->
-      {form} = {}
+  describe '::submit()', ->
+    {form} = {}
+    beforeEach ->
+      form = new Springform()
+        .set 'process', (done) ->
+          form.formError = 'processing failed'
+          done()
+
+    it 'calls the processor', ->
+      form.submit()
+      form.formError.should.equal 'processing failed'
+
+    describe 'given an async processor', ->
+      {complete} = {}
       beforeEach ->
-        form = new Springform()
-          .processor (done) ->
-            form.formError = 'processing failed'
-            done()
-
-      it 'calls the processor', ->
+        form.process = sinon.spy (done) ->
+          complete = done
         form.submit()
-        form.formError.should.equal 'processing failed'
 
-      describe 'given an async processor', ->
-        {complete} = {}
+      it 'sets processing flag', ->
+        form.processing.should.equal true
+
+      describe 'when the form is submitted while processing', ->
         beforeEach ->
-          form.processor sinon.spy (done) ->
-            complete = done
           form.submit()
 
-        it 'sets processing flag', ->
-          form.processing.should.equal true
+        it "doesn't call the processor again", ->
+          form.process.callCount.should.equal 1
 
-        describe 'when the form is submitted while processing', ->
-          beforeEach ->
-            form.submit()
+      describe 'when the processor completes', ->
+        beforeEach (done) ->
+          setTimeout (-> complete(); done()), 1
 
-          it "doesn't call the processor again", ->
-            form.process.callCount.should.equal 1
+        it 'clears the processing flag', ->
+          form.processing.should.equal false
 
-        describe 'when the processor completes', ->
-          beforeEach (done) ->
-            setTimeout (-> complete(); done()), 1
+    describe 'given an event', ->
+      {event, prevented} = {}
+      beforeEach ->
+        prevented = false
+        event = preventDefault: -> prevented = true
 
-          it 'clears the processing flag', ->
-            form.processing.should.equal false
+      it 'prevents default submission', ->
+        form.submit(event)
+        prevented.should.equal true
 
-      describe 'given an event', ->
-        {event, prevented} = {}
-        beforeEach ->
-          prevented = false
-          event = preventDefault: -> prevented = true
+    describe 'called without context', ->
+      it 'is bound to the form', ->
+        submit = form.submit
+        submit()
 
-        it 'prevents default submission', ->
-          form.submit(event)
-          prevented.should.equal true
+    describe '::set()', ->
+      {form} = {}
+      beforeEach ->
+        form = new Springform
 
-      describe 'called without context', ->
-        it 'is bound to the form', ->
-          submit = form.submit
-          submit()
+      it 'assigns data', ->
+        form.set 'data', foo: 'bar'
+        form.data.foo.should.equal 'bar'
 
-    describe '::processor()', ->
       it 'assigns the process function', ->
         model = save: (done) ->
-        form.processor model.save
+        form.set 'process', model.save
+        form.process.should.equal model.save
+
+      it 'supports object notation', ->
+        model = save: (done) ->
+
+        form.set process: model.save
         form.process.should.equal model.save
 
       it 'is chainable', ->
-        form.processor((done)->).should.equal form
+        form.set('processor', (done)->).should.equal form
 
   describe 'validators', ->
     describe 'required', ->
@@ -217,14 +219,12 @@ describe 'Springform', ->
           ]
 
       it 'adds per-field error messages for missing values', ->
-        new Form()
-          .bind({})
+        new Form(data: {})
           .validate()
           .fieldErrors.sound.should.be.ok
 
       it 'passes with Boolean false value', ->
-        new Form()
-          .bind(sound: false)
+        new Form(data: sound: false)
           .validate()
           .fieldErrors.should.not.have.property 'sound'
 

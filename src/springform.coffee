@@ -10,8 +10,13 @@ class Springform
     for field in @fields
       @fields[field.name] = field
 
-  bind: (data) ->
-    @data = data
+  set: (key, value) ->
+    if typeof key is 'string'
+      @[key] = value
+    else
+      args = key
+      for key, value of args
+        @[key] = value
     @
 
   prunedData: ->
@@ -54,8 +59,6 @@ class Springform
       @processing = false
 
   process: (done) -> done()
-
-  processor: (@process) -> @
 
 Springform.required = (fields...) ->
   ({data, fieldErrors}) ->

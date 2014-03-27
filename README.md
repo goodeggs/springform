@@ -90,7 +90,7 @@ Springforms pass around error messages with this structure:
 {
   formError: < ... >,
   fieldErrors: {
-    <fieldName>: < ... >, 
+    <fieldName>: < ... >,
     <otherFieldName>: < ... >
   }
 }
@@ -121,7 +121,7 @@ Validators are functions with the signature `(form, [done])`.  Validators in Spr
 
 These two reponsibilities are application specific.  One app might list all required fields at the top of the form, another might flag each missing field individually.  You should definitely compose your validators using existing libraries (like [chriso/validator.js](https://github.com/chriso/validator.js)), but you'll need to add the two responsibilities above following the conventions of your app.
 
-Validators can by syncronous or asyncronous.  
+Validators can by syncronous or asyncronous.
 
 #### Simple
 The simplest validators are syncronous.  They just assign error messages to the passed in form:
@@ -148,7 +148,7 @@ function(form, done) {
 
 API
 ---
-#### bind(data)
+#### set('data', {...})
 Chainable sugar to set `form.data`.  Feel free to set form.data directly if you don't need chainability.
 
 #### hasErrors()
@@ -169,7 +169,7 @@ Call `process()` and set the `processing` flag while it's running.  Calls `preve
 #### process(done)
 An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done` if you want to unlock form re-submission.  Processors frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `processor()`.
 
-#### processor(processorFn)
+#### set('process', processorFn)
 Chainable sugar to set `process`.
 
 
