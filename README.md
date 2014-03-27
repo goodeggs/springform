@@ -45,7 +45,7 @@ Validate a form server-side
 Here's how you might validate an XMLHttpRequest JSON form POST from an express controller, and send back validation errors to be shown on the client:
 ```js
 functinon (req, res) {
-  var form = new RobotForm().bind(req.body).validate()
+  var form = new RobotForm({data: req.body}).validate()
   if(form.hasErrors()) {
     res.json(form.errors())
   } else {
@@ -59,9 +59,9 @@ Show form errors client-side
 You might use [Rivets](http://www.rivetsjs.com/) to bind a Springform form to the DOM:
 ```
 var robot = {sound: 'beep', color: 'red'},
-    form = new Springform()
-      .bind(robot)
-      .processor(function (done) {
+    form = new Springform({
+      data: robot,
+      save: function (done) {
         $.ajax({
           dataType: 'json',
           data: robot,
@@ -74,6 +74,7 @@ var robot = {sound: 'beep', color: 'red'},
           }
         })
       })
+    })
 
 rivets.bind(formEl, form)
 ```
@@ -157,22 +158,21 @@ Returns true if `formError` or any `fieldErrors[*]` is truthy.
 #### validate([done])
 Clear `formError` and `fieldErrors` then run all the `validators`.  You can always pass a callback, to be called when all validators have finished.  It's an especially good idea if any of your validators are async.
 
-#### validator(validatorFn)
+#### addValidator(validatorFn)
 Chainable sugar to push a [validator function](#validators) onto `validators` to be run when `validate()` is called.
 
 #### validators
 An array of [validator function](#validators) to run when `validate()` is called.  You can set `validators` directly, set it on a prototype, or call `validator()` to add validators one at a time.
 
 #### submit([event])
-Call `process()` and set the `processing` flag while it's running.  Calls `preventDefault()` on the passed in event if used as an event listener.
+Call `save()` and set the `saving` flag while it's running.  Calls `preventDefault()` on the passed in event if used as an event listener.
 
-#### process(done)
-An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done` if you want to unlock form re-submission.  Processors frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `processor()`.
+#### save(done)
+An async function that does the work of submitting the form.  Could be an Ajax POST, a model.save(), or something else entirely.  Be sure to call `done` if you want to unlock form re-submission.  Save functions frequently call some combination of `validate()`, `errors({...})`, and `hasErrors()`.  Define this function on an instance, on a prototype, or pass it in to `set()`.
 
-#### set('process', processorFn)
-Chainable sugar to set `process`.
+#### saving
+A boolean flag that's `true` while the form is saving.
 
-
-
-
+#### set('save', saveFn)
+Chainable sugar to set `save`.
 
