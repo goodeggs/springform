@@ -139,37 +139,37 @@ describe 'Springform', ->
     {form} = {}
     beforeEach ->
       form = new Springform()
-        .set 'process', (done) ->
-          form.formError = 'processing failed'
+        .set 'save', (done) ->
+          form.formError = 'saving failed'
           done()
 
-    it 'calls the processor', ->
+    it 'calls the save function', ->
       form.submit()
-      form.formError.should.equal 'processing failed'
+      form.formError.should.equal 'saving failed'
 
-    describe 'given an async processor', ->
+    describe 'given an async save function', ->
       {complete} = {}
       beforeEach ->
-        form.process = sinon.spy (done) ->
+        form.save = sinon.spy (done) ->
           complete = done
         form.submit()
 
-      it 'sets processing flag', ->
-        form.processing.should.equal true
+      it 'sets saving flag', ->
+        form.saving.should.equal true
 
-      describe 'when the form is submitted while processing', ->
+      describe 'when the form is submitted while saving', ->
         beforeEach ->
           form.submit()
 
-        it "doesn't call the processor again", ->
-          form.process.callCount.should.equal 1
+        it "doesn't call the save function again", ->
+          form.save.callCount.should.equal 1
 
-      describe 'when the processor completes', ->
+      describe 'when the save function completes', ->
         beforeEach (done) ->
           setTimeout (-> complete(); done()), 1
 
-        it 'clears the processing flag', ->
-          form.processing.should.equal false
+        it 'clears the saving flag', ->
+          form.saving.should.equal false
 
     describe 'given an event', ->
       {event, prevented} = {}
@@ -195,19 +195,19 @@ describe 'Springform', ->
         form.set 'data', foo: 'bar'
         form.data.foo.should.equal 'bar'
 
-      it 'assigns the process function', ->
+      it 'assigns the save function', ->
         model = save: (done) ->
-        form.set 'process', model.save
-        form.process.should.equal model.save
+        form.set 'save', model.save
+        form.save.should.equal model.save
 
       it 'supports object notation', ->
         model = save: (done) ->
 
-        form.set process: model.save
-        form.process.should.equal model.save
+        form.set save: model.save
+        form.save.should.equal model.save
 
       it 'is chainable', ->
-        form.set('processor', (done)->).should.equal form
+        form.set('save', (done)->).should.equal form
 
   describe 'validators', ->
     describe 'required', ->

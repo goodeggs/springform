@@ -53,12 +53,12 @@ class Springform
 
   submit: (event) =>
     event?.preventDefault()
-    return if @processing
-    @processing = true
-    @process =>
-      @processing = false
+    return if @saving
+    @saving = true
+    @save =>
+      @saving = false
 
-  process: (done) -> done()
+  save: (done) -> done()
 
 Springform.required = (fields...) ->
   ({data, fieldErrors}) ->
