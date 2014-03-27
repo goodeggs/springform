@@ -77,7 +77,7 @@ describe 'Springform', ->
 
     describe 'with async validators', ->
       beforeEach ->
-        form.validator (form, done) ->
+        form.addValidator (form, done) ->
           setTimeout ->
             form.formError = 'invalid'
             done()
@@ -91,17 +91,17 @@ describe 'Springform', ->
     it 'is chainable', ->
       form.validate().should.equal form
 
-  describe '::validator()', =>
+  describe '::addValidator()', =>
     {form} = {}
     beforeEach ->
       form = new Springform()
 
-    it 'adds a validator', ->
-      form.validator (form) ->
+    it 'pushes a validator onto the list of form validators', ->
+      form.addValidator (form) ->
       form.validators.length.should.equal 1
 
     it 'is chainable', ->
-      form.validator((form) ->).should.equal form
+      form.addValidator((form) ->).should.equal form
 
   describe '::hasErrors()', ->
     {form} = {}

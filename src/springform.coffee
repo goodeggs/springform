@@ -30,7 +30,7 @@ class Springform
     else
       {@formError, @fieldErrors}
 
-  validator: (validator) ->
+  addValidator: (validator) ->
     @validators.push validator
     @
 
