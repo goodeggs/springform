@@ -73,7 +73,7 @@ class Gate
     @returnedCount = 0
 
   checkDone: ->
-    if @returnedCount == @callbacks.length
+    if @returnedCount == @callbacks.length and @done?
       setTimeout @done, 0
 
   callback: ->
